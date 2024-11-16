@@ -2,21 +2,26 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const authRoutes = require('./routes/authRoutes');
+const profRoutes = require('./routes/profileRoutes');
+const slotRoutes = require('./routes/slotRoutes');
+const rateRoutes = require('./routes/ratingRoute');
 const app = express();
 app.use(express.json());
-
-//Database connection
-mongoose.connect(process.env.MONGO_URI)
-	.then(() => console.log("Database connected"))
-	.catch((err) => console.error("MongoDB connection error:", err))
 
 //Routes
 app.get("/", (req, res) => {
 	res.send("Welcome to FYC");
 });
-
-const authRoutes = require('./routes/authRoutes');
 app.use("/api/auth", authRoutes);
+app.use("/api/users", profRoutes);
+app.use("/api/users", slotRoutes);
+app.use("/api/ratings", rateRoutes);
+
+//Database connection
+mongoose.connect(process.env.MONGO_URI)
+	.then(() => console.log("Database connected"))
+	.catch((err) => console.error("MongoDB connection error:", err))
 
 //Port 
 const PORT = process.env.PORT || 5000;
