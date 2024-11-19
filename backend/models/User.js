@@ -5,7 +5,17 @@ const ratingSchema = new mongoose.Schema({
 	rating: { type: Number, required: true, min: 1, max: 5 },
 	comment: { type: String }
 });
+const feedbackSchema = new mongoose.Schema({
+	clientId: mongoose.Schema.Types.ObjectId,
+	feedbackText: String,
+	submittedAt: { type: Date, default: Date.now }
+})
 
+const slotSchema = new mongoose.Schema({
+	date: { type: Date },
+	startTime: { type: String },
+	endTime: { type: String }
+})
 const userSchema = new mongoose.Schema({
 	profilePic: { type: String },
 	firstname: { type: String, required: true },
@@ -16,12 +26,9 @@ const userSchema = new mongoose.Schema({
 	role: { type: String, enum: ["client", "trainer"], required: true },
 	profileInfo: { type: String },
 	goals: { type: String },
-	availableSlots: [{
-		date: { type: Date },
-		startTime: { type: String },
-		endTime: { type: String }
-	}],
-	ratings: [ratingSchema]
+	availableSlots: [slotSchema],
+	ratings: [ratingSchema],
+	feedback: [feedbackSchema]
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
