@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const profRoutes = require('./routes/profileRoutes');
 const slotRoutes = require('./routes/slotRoutes');
 const rateRoutes = require('./routes/ratingRoute');
+const fbRoutes = require('./routes/feedbackRoute');
 const app = express();
 app.use(express.json());
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", profRoutes);
 app.use("/api/users", slotRoutes);
 app.use("/api/ratings", rateRoutes);
+app.use("/api/feedback", fbRoutes);
 
 //Database connection
 mongoose.connect(process.env.MONGO_URI)

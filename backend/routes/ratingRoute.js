@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
 
-router.post('/:username/ratings', async (req, res) => {
+router.post('/:username', async (req, res) => {
 	const { username } = req.params;
 	const { clientId, rating, comment } = req.body;
 
@@ -31,7 +31,7 @@ router.post('/:username/ratings', async (req, res) => {
 });
 
 
-router.get('/:username/ratings', async (req, res) => {
+router.get('/:username', async (req, res) => {
 	const { username } = req.params;
 
 	try {

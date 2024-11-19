@@ -27,10 +27,10 @@ router.get('/:username/available-slots', async (req, res) => {
 		const trainer = await User.findOne({ username, role: "trainer" });
 		if (!trainer) return res.status(400).json({ message: "Trainer not found" });
 
-		const slotsWithoutId = trainer.availableSlots.map(slot => {
+		const slotsWithoutId = trainer.availableSlots.map(slot => ({
 			date: slot.date,
-				time: slot.time,
-		});
+			time: slot.time,
+		}));
 		res.json({ availableSlots: slotsWithoutId });
 	} catch (error) {
 		res.status(500).json({ messages: "Error fetching slots" });
