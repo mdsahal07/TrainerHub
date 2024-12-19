@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
@@ -9,16 +11,16 @@ const rateRoutes = require('./routes/ratingRoute');
 const fbRoutes = require('./routes/feedbackRoute');
 const app = express();
 app.use(express.json());
-
+app.use(cors());
 //Routes
 app.get("/", (req, res) => {
-	res.send("Welcome to FYC");
+	res.send("Welcome to TrainerHub");
 });
-app.use("/api/auth", authRoutes);
-app.use("/api/users", profRoutes);
-app.use("/api/users", slotRoutes);
-app.use("/api/ratings", rateRoutes);
-app.use("/api/feedback", fbRoutes);
+app.use("/auth", authRoutes);
+app.use(profRoutes);
+app.use(slotRoutes);
+app.use(rateRoutes);
+app.use(fbRoutes);
 
 //Database connection
 mongoose.connect(process.env.MONGO_URI)

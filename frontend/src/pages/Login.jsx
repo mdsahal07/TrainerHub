@@ -1,0 +1,69 @@
+import { useState } from "react";
+import axios from "axios";
+
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Login", { email, password });
+
+    if (!email || !password) {
+      alert("Please fill in both email and password");
+      return;
+    }
+
+    const userData = { email, password };
+    try {
+      const response = await axios.post("http://localhost:5000/auth/login", userData);
+      alert(response.data.message);
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      alert(error.response?.data.message || "An error occured while login");
+    }
+    // Call backend API for login
+  };
+
+  return (<div>
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-900">
+      <h1 className="text-3xl font-bold text-white mb-8">Trainer Hub</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-800 p-6 rounded-md border shadow-md w-full max-w-sm"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-white text-center">
+          Login
+        </h2>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border border-gray-700 bg-gray-700 text-white p-2 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autoComplete="email"
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border border-gray-700 bg-gray-700 text-white p-2 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autoComplete="current-password"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
+  );
+}
+export default Login;
