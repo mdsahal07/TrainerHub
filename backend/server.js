@@ -1,14 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
 require('dotenv').config();
-
 const authRoutes = require('./routes/authRoutes');
-const profRoutes = require('./routes/profileRoutes');
-const slotRoutes = require('./routes/slotRoutes');
-const rateRoutes = require('./routes/ratingRoute');
-const fbRoutes = require('./routes/feedbackRoute');
+const clientDashboard = require('./routes/dashRoutes');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -17,11 +12,7 @@ app.get("/", (req, res) => {
 	res.send("Welcome to TrainerHub");
 });
 app.use("/auth", authRoutes);
-app.use(profRoutes);
-app.use(slotRoutes);
-app.use(rateRoutes);
-app.use(fbRoutes);
-
+app.use("/dashboard", clientDashboard);
 //Database connection
 mongoose.connect(process.env.MONGO_URI)
 	.then(() => console.log("Database connected"))
