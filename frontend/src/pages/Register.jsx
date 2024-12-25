@@ -15,6 +15,7 @@ function Register() {
     const userData = { fname, username, email, password, role };
     try {
       const response = await axios.post("http://localhost:5000/auth/register", userData);
+      console.log("First section");
       alert(response.data.message);
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,10 +19,19 @@ function Login() {
     const userData = { email, password };
     try {
       const response = await axios.post("http://localhost:5000/auth/login", userData);
-      alert(response.data.message);
+      const { message, redirectURL, token } = response.data;
+      alert(message);
+      if (redirectURL) {
+        // Save token to localStorage (optional)
+        localStorage.setItem("token", token);
+
+        // Navigate to the dashboard
+        navigate(redirectURL);
+      } else {
+        alert("Redirection URL not provided.");
+      }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
-      alert(error.response?.data.message || "An error occured while login");
     }
     // Call backend API for login
   };
@@ -55,6 +66,7 @@ function Login() {
           className="border border-gray-700 bg-gray-700 text-white p-2 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           autoComplete="current-password"
         />
+        <a href="/forgot-password" className="text-white text-sm ">Forgot Password?</a>
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
