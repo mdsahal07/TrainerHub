@@ -1,10 +1,9 @@
-const Client = require('../models/Client');
+import Client from '../models/Client.js';
 
-
-const getClientDashboard = async (req, res) => {
+export const getClientDashboard = async (req, res) => {
 	try {
 		// `req.user` should already be populated by the `verifyToken` middleware
-		const clientId = req.user.userId;
+		const clientId = req.user.id;
 		console.log("clientId", clientId);
 		// Find the client in the database
 		const client = await Client.findById(clientId);
@@ -28,4 +27,3 @@ const getClientDashboard = async (req, res) => {
 	}
 };
 
-module.exports = { getClientDashboard };

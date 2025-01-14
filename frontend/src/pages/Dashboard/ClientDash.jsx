@@ -1,23 +1,41 @@
+// Frontend: src/pages/dashboard/ClientDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/Cards';
+import ProgressChart from '../../components/ProgressChart';
 import axios from 'axios';
 
-const ClientDash = () => {
+const ClientDashboard = () => {
+  const [stats, setStats] = useState(null); // Client's stats (name, progress)
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const [chartData, setChartData] = useState(null); // Chart data
 
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("token"); // Assuming JWT is stored in localStorage
-        const response = await axios.get("http://localhost:5000/dashboard/client", {
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+        const response = await axios.get('http://localhost:5000/clientDash/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        const { name, progress } = response.data;
+
+        // Set data for dashboard
         setStats(response.data);
+        setChartData({
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          datasets: [
+            {
+              label: 'Progress Over Time',
+              data: progress || [10, 20, 30, 40],
+              borderColor: '#42A5F5',
+              backgroundColor: 'rgba(66, 165, 245, 0.2)',
+            },
+          ],
+        });
         setLoading(false);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch data");
+        setError(err.response?.data?.message || 'Failed to fetch dashboard data');
         setLoading(false);
       }
     };
@@ -27,42 +45,59 @@ const ClientDash = () => {
 
   const cards = [
     {
-      title: "Explore Trainers",
-      description: "Find and connect with top trainers",
-      path: "/explore-trainers",
+      title: 'Explore Trainers',
+      description: 'Find and connect with top trainers',
+      path: '/search/top-trainers',
       icon: <i className="fas fa-dumbbell"></i>,
     },
     {
-      title: "Meeting",
-      description: "face to face meeting with your trianer",
-      path: "/video-call",
-      icon: <i className="fas fa-video"></i>,
+      title: 'Your Trainer',
+      description: 'trainer profile(Rate & feedback)',
+      path: '/trainer',
+      icon: <i className="fas fa-calculator"></i>,
     },
     {
-      title: "Progress Report",
-      description: "See your progress",
-      path: "/progress",
-      icon: <i className="fas fa-chart-line"></i>,
+      title: 'Meeting',
+      description: 'Face-to-face meeting with your trainer',
+      path: '/video-call',
+      icon: <i className="fas fa-video"></i>,
     },
   ];
+
+  if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
+
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
-      <h2 className="text-2xl font-light mb-4">Welcome back, !</h2>
+    <div className="bg-gray-100 min-h-screen p-8 relative">
+      {/* Header */}
+      <header className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-light">
+          Welcome back, {stats?.name || 'User'}!
+        </h2>
+        <img
+          src={stats?.profilePicture || '/default-avatar.png'}
+          alt="Profile"
+          className="h-10 w-10 rounded-full cursor-pointer"
+          onClick={() => (window.location.href = '/profile')} // Navigate to profile page
+        />
+      </header>
+
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cards.map((cards, index) => (
-          <Card
-            key={index}
-            title={cards.title}
-            description={cards.description}
-            path={cards.path}
-            icon={cards.icon}
-          />
+        {cards.map((card, index) => (
+          <Card key={index} title={card.title} description={card.description} path={card.path} icon={card.icon} />
         ))}
       </div>
+
+      {/* Progress Chart */}
+      <div className="mt-8 bg-white p-4 shadow rounded">
+        <h3 className="text-lg font-semibold mb-4">Your Progress Chart</h3>
+        <div className="h-64 flex justify-center items-center border rounded">
+          <ProgressChart data={chartData} title="Your Progress Chart" />
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-
-export default ClientDash;
+export default ClientDashboard;

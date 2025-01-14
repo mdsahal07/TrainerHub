@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const trainerSchema = new mongoose.Schema({
 	profilePic: { type: String },
@@ -7,7 +7,19 @@ const trainerSchema = new mongoose.Schema({
 	email: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	rating: { type: Number, default: 0 },
-	experience: { type: String },
+	bio: { type: String, default: " " },
+	specialization: { type: String, default: " " },
+	certification: { type: String, default: " " },
+	experience: { type: String, default: "" },
+	availability: { type: String },
+	connection: [
+		{
+			clientId: mongoose.Schema.Types.ObjectId,
+			clientName: String,
+			status: { type: String, default: 'pending' }, // Default status is 'pending'
+		}]
 }, { timestamps: true });
 
-module.exports = mongoose.model("Trainer", trainerSchema);
+const Trainer = mongoose.model("Trainer", trainerSchema);
+
+export default Trainer;

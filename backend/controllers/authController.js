@@ -1,14 +1,13 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const Client = require('../models/Client');
-const Trainer = require('../models/Trainer');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import Client from '../models/Client.js';
+import Trainer from '../models/Trainer.js';
 
 //Registering a new user
-const register = async (req, res) => {
+export const register = async (req, res) => {
 	const { fname, username, email, password, role } = req.body;
-	console.log("controller One");
 
 	const [existingUserByUsernameClient, existingUserByUsernameTrainer] = await Promise.all([
 		Client.findOne({ username }),
@@ -39,9 +38,8 @@ const register = async (req, res) => {
 	res.status(201).json({ message: "User registered successfully" });
 }
 //Login an existing user
-const login = async (req, res) => {
+export const login = async (req, res) => {
 	const { email, password } = req.body;
-	console.log("login controller");
 	try {
 		const [client, trainer] = await Promise.all([
 			Client.findOne({ email }),
@@ -56,8 +54,7 @@ const login = async (req, res) => {
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) return res.status(400).json({ message: "Incorrect password" });
 
-		const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_TOKEN, { expiresIn: "7d" });
-		console.log("role", user.role);
+		const token = jwt.sign({ userId: user._id, role }, process.env.JWT_TOKEN, { expiresIn: "7d" });
 
 		let redirectURL;
 		switch (role) {
@@ -79,7 +76,7 @@ const login = async (req, res) => {
 	}
 };
 
-const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
 	const { email } = req.body;
 
 	try {
@@ -104,8 +101,8 @@ const forgotPassword = async (req, res) => {
 		const transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {
-				user: 'process.env.EMAIL_USER',
-				pass: 'process.env.EMAIL_PASS',
+				user: process.env.EMAIL_USER,
+				pass: process.env.EMAIL_PASS,
 			},
 		});
 
@@ -123,5 +120,4 @@ const forgotPassword = async (req, res) => {
 		res.status(500).json({ success: false, message: "Server error" });
 	}
 };
-module.exports = { register, login, forgotPassword };
 
