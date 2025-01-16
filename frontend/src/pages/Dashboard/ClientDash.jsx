@@ -1,4 +1,3 @@
-// Frontend: src/pages/dashboard/ClientDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/Cards';
 import ProgressChart from '../../components/ProgressChart';
@@ -48,13 +47,13 @@ const ClientDashboard = () => {
       title: 'Explore Trainers',
       description: 'Find and connect with top trainers',
       path: '/search/top-trainers',
-      icon: <i className="fas fa-dumbbell"></i>,
+      icon: <i className="fas fa-users"></i>,
     },
     {
       title: 'Your Trainer',
-      description: 'trainer profile(Rate & feedback)',
+      description: 'Trainer profile(Rate & feedback)',
       path: '/trainer',
-      icon: <i className="fas fa-calculator"></i>,
+      icon: <i className="fas fa-dumbbell"></i>,
     },
     {
       title: 'Meeting',
@@ -74,12 +73,30 @@ const ClientDashboard = () => {
         <h2 className="text-2xl font-light">
           Welcome back, {stats?.name || 'User'}!
         </h2>
-        <img
-          src={stats?.profilePicture || '/default-avatar.png'}
-          alt="Profile"
-          className="h-10 w-10 rounded-full cursor-pointer"
-          onClick={() => (window.location.href = '/profile')} // Navigate to profile page
-        />
+        {stats?.profilePicture ? (
+          <img
+            src={stats.profilePicture}
+            alt="Profile"
+            className="h-10 w-10 rounded-full cursor-pointer"
+            onClick={() => (window.location.href = '/profile')} // Navigate to profile page
+          />
+        ) : (
+          <div
+            className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 cursor-pointer"
+            onClick={() => (window.location.href = '/profile')} // Navigate to profile page
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+            >
+              <path
+                d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-2.7 0-8.4 1.4-8.4 4.2v1.2c0 .6.6 1.2 1.2 1.2h14.4c.6 0 1.2-.6 1.2-1.2v-1.2c0-2.8-5.7-4.2-8.4-4.2z"
+              />
+            </svg>
+          </div>
+        )}
       </header>
 
       {/* Cards */}

@@ -11,6 +11,7 @@ import TrainerDashboard from "./pages/Dashboard/TrainerDash";
 import AdminDashboard from "./pages/Dashboard/AdminDash";
 import VideoCall from "./components/VideoCall";
 import PendingReq from "./pages/PendingReq";
+import TrainerSchedule from "./pages/TrainerSchedule.jsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard/client" element={<ClientDashboard />} />
         <Route path="/dashboard/trainer" element={<TrainerDashboard />} />
         <Route path="/pending-req" element={<PendingReq />} />
+        <Route path="/schedule/:traineId" element={<TrainerSchedule />} />
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>

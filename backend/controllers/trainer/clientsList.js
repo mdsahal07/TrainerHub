@@ -17,7 +17,6 @@ export const acceptedClients = async (req, res) => {
 
 		// Extract client details from the populated `clientId`
 		const clients = acceptedRequests.map((request) => request.clientId);
-		console.log("clients : ", clients);
 
 		res.status(200).json({ clients });
 	} catch (error) {

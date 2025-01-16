@@ -59,7 +59,7 @@ const TrainerDashboard = () => {
     {
       title: 'Schedule',
       description: 'Manage your schedule and meetings',
-      path: '/schedule',
+      path: '/schedule/:trainerId',
       icon: <i className="fas fa-calendar-alt"></i>,
     },
   ];

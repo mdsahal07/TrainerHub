@@ -16,6 +16,8 @@ import trainerRoute from './routes/client/trainerRoute.js';
 import videoCallRoute from './routes/videoCallRoutes.js';
 import trainerDash from './routes/trainer/trainerDash.js';
 import handleReq from './routes/handleReq.js';
+import scheduler from './routes/trainer/scheduleRoute.js';
+import notification from './routes/trainer/notify.js';
 
 const app = express();
 const server = http.createServer(app); //creating http server for socket.io
@@ -40,6 +42,8 @@ app.use("/search", searchRoute);
 app.use("/trainer", trainerRoute);
 app.use("/videocall", videoCallRoute);
 app.use("/request", handleReq);
+app.use("/schedule", scheduler);
+app.use("/notify", notification);
 
 // WebSocket Setup
 socketHandler(io)
