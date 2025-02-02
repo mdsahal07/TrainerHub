@@ -2,36 +2,50 @@ import React, { useState } from 'react';
 import TimeSlot from './TimeSlot';
 import TimeSlotForm from './TimeSlotForm';
 
-const TimeSlotsTable = ({ selectedDate, timeSlots, trainerId, addNewSlot }) => {
-	const [showForm, setShowForm] = useState(false);
-
-	const handleAddSlot = () => {
-		setShowForm(true);
-	};
-
-	const handleCloseForm = () => {
-		setShowForm(false);
-	};
+const TimeSlotsTable = ({ selectedDate, timeSlots, trainerId, addNewSlot, deleteSlot, showForm, setShowForm }) => {
 
 	return (
-		<div className="mt-4">
-			<h2 className="text-xl font-semibold">Available Slots for {selectedDate.toDateString()}</h2>
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{timeSlots.length === 0 ? (
-					<h4>You didn't schedule any meeting for {selectedDate.toDateString()}</h4>
-				) : (
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						{timeSlots.map((slot) => (
-							<TimeSlot key={slot._id} slot={slot} />
+		<div>
+			<h3 className="text-xl font-bold mb-2">Time Slots for {selectedDate.toDateString()}</h3>
+			{timeSlots.length > 0 ? (
+				<table className="w-full border-collapse">
+					<thead>
+						<tr>
+							<th className="border p-2">Start Time</th>
+							<th className="border p-2">End Time</th>
+							<th className="border p-2">Client</th>
+							<th className="border p-2">Description</th>
+							<th className="border p-2">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{timeSlots.map(slot => (
+							<tr key={slot._id}>
+								<td className="border p-2">{new Date(slot.startTime).toLocaleTimeString()}</td>
+								<td className="border p-2">{new Date(slot.endTime).toLocaleTimeString()}</td>
+								<td className="border p-2">{slot.clientId.name}</td>
+								<td className="border p-2">{slot.description}</td>
+								<td className="border p-2">
+									<button onClick={() => deleteSlot(slot._id)} className="bg-red-500 text-white p-2 rounded">Delete</button>
+								</td>
+							</tr>
 						))}
-					</div>
-				)}
-				{showForm ? (
-					<TimeSlotForm trainerId={trainerId} selectedDate={selectedDate} onClose={handleCloseForm} addNewSlot={addNewSlot} />
-				) : (
-					<button onClick={handleAddSlot} className="mt-4 bg-blue-500 text-white p-2 rounded">+ Add Slot</button>
-				)}
-			</div>
+					</tbody>
+				</table>
+			) : (
+				<div>
+					<p>No slots booked for this date.</p>
+					<button onClick={() => setShowForm(true)} className="bg-green-500 text-white p-2 rounded">+</button>
+				</div>
+			)}
+			{showForm && (
+				<TimeSlotForm
+					trainerId={trainerId}
+					selectedDate={selectedDate}
+					onClose={() => setShowForm(false)}
+					addNewSlot={addNewSlot}
+				/>
+			)}
 		</div>
 	);
 };

@@ -17,7 +17,8 @@ import videoCallRoute from './routes/videoCallRoutes.js';
 import trainerDash from './routes/trainer/trainerDash.js';
 import handleReq from './routes/handleReq.js';
 import scheduler from './routes/trainer/scheduleRoute.js';
-import notification from './routes/trainer/notify.js';
+import notification from './routes/notify.js';
+
 
 const app = express();
 const server = http.createServer(app); //creating http server for socket.io
@@ -47,6 +48,7 @@ app.use("/notify", notification);
 
 // WebSocket Setup
 socketHandler(io)
+
 //Database connection
 mongoose.connect(process.env.MONGO_URI)
 	.then(() => console.log("Database connected"))

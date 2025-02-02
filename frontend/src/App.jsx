@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -12,10 +13,23 @@ import AdminDashboard from "./pages/Dashboard/AdminDash";
 import VideoCall from "./components/VideoCall";
 import PendingReq from "./pages/PendingReq";
 import TrainerSchedule from "./pages/TrainerSchedule.jsx";
+import Navbar from "./components/Navbar.jsx";
+import NotifyBar from "./components/NotifyBar.jsx";
 
 function App() {
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const handleNotificationClick = () => {
+    setShowSidebar(true);
+  };
+
+  const handleCloseSidebar = () => {
+    setShowSidebar(false);
+  };
   return (
     <Router>
+      <Navbar onNotificationClick={handleNotificationClick} />
+      <NotifyBar visible={showSidebar} onClose={handleCloseSidebar} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

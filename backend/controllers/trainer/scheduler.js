@@ -1,13 +1,15 @@
 import Schedule from '../../models/Schedule.js';
 import Client from '../../models/Client.js';
+import Trainer from '../../models/Trainer.js';
 
 export const createSchedule = async (req, res) => {
-	const { trainerId, clientId, startTime, endTime, description } = req.body;
+	const { trainerId, clientId, username, startTime, endTime, description } = req.body;
 
 	try {
 		const newSchedule = new Schedule({
 			trainerId,
 			clientId,
+			username,
 			startTime,
 			endTime,
 			description
@@ -21,16 +23,31 @@ export const createSchedule = async (req, res) => {
 	}
 };
 
-export const getTrainerSchedule = async (req, res) => {
-	const { trainerId } = req.params;
+export const getSchedulesByDate = async (req, res) => {
+	const { trainerId, date } = req.params;
+	const startOfDay = new Date(date);
+	startOfDay.setUTCHours(0, 0, 0, 0);
+	const endOfDay = new Date(date);
+	endOfDay.setUTCHours(23, 59, 59, 999);
+
 	try {
-		const schedules = await Schedule.find({ trainerId }).populate('clientId', 'fname email');
-		if (!schedules.length) {
-			return res.status(404).json({ message: 'No schedules found for the given trainer ID' });
-		}
+		const schedules = await Schedule.find({
+			trainerId,
+			startTime: { $gte: startOfDay, $lt: endOfDay }
+		}).populate('clientId', 'name email');
 		res.status(200).json(schedules);
 	} catch (error) {
 		res.status(500).json({ message: 'Error fetching schedules', error });
+	}
+};
+
+export const deleteSchedule = async (req, res) => {
+	const id = req.params.slotId;
+	try {
+		await Schedule.findByIdAndDelete(id);
+		res.status(200).json({ message: 'Schedule deleted successfully' });
+	} catch (error) {
+		res.status(500).json({ message: 'Error deleting schedule', error });
 	}
 };
 
@@ -48,3 +65,20 @@ export const getUserByUsername = async (req, res) => {
 		res.status(500).json({ message: 'Error fetching user', error });
 	}
 };
+
+export const getUsernameById = async (req, res) => {
+	const { trainerId } = req.query;
+	try {
+		const user = await Trainer.findOne({ trainerId });
+
+		const userId = user.username;
+		console.log("Trainer Id : ", trainerId);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		res.status(200).json(userId);
+	} catch (error) {
+		res.status(500).json({ message: "Error fetching user ", error });
+	}
+
+}

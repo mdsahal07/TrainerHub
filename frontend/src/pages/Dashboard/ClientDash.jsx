@@ -67,7 +67,7 @@ const ClientDashboard = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8 relative">
+    <div className="bg-gray-100 min-h-screen p-8 relative z-10">
       {/* Header */}
       <header className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-light">

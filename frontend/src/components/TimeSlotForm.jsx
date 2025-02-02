@@ -16,14 +16,17 @@ const TimeSlotForm = ({ trainerId, selectedDate, onClose, addNewSlot }) => {
 			end.setHours(endTime.split(':')[0], endTime.split(':')[1]);
 			const clientResponse = await axios.get(`http://localhost:5000/schedule/finduser?username=${clientName}`);
 			const clientId = clientResponse.data._id;
-
+			console.log("clientId : ", clientId);
+			const username = clientResponse.data.username;
 			const newSlot = await axios.post(`http://localhost:5000/schedule/create`, {
 				trainerId,
 				clientId,
+				username,
 				startTime: start.toISOString(),
 				endTime: end.toISOString(),
 				description
 			});
+			console.log(newSlot.data);
 			addNewSlot(newSlot.data);
 			onClose();
 		} catch (error) {
