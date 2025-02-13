@@ -17,7 +17,10 @@ const trainerSchema = new mongoose.Schema({
 			clientId: mongoose.Schema.Types.ObjectId,
 			clientName: String,
 			status: { type: String, default: 'pending' }, // Default status is 'pending'
-		}]
+		}],
+
+	resetPasswordToken: String,
+	resetPasswordExpires: Date,
 }, { timestamps: true });
 
 const Trainer = mongoose.model("Trainer", trainerSchema);

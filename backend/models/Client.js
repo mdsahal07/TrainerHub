@@ -11,6 +11,8 @@ const clientSchema = new Schema({
 	goals: { type: String, default: "" },
 	bio: { type: String, default: "" },
 	subscribedTrainers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trainer' }],
+	resetPasswordToken: String,
+	resetPasswordExpires: Date,
 }, { timestamps: true });
 
 const Client = model("Client", clientSchema);

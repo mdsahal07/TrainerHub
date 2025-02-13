@@ -71,11 +71,10 @@ const NotifyBar = ({ visible, onClose }) => {
             onClick={() => setShowStoredNotifications(!showStoredNotifications)}
             className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
           >
-            {showStoredNotifications ? 'Hide Stored Notifications' : 'Show Stored Notifications'}
+            {showStoredNotifications ? 'All Notifications' : 'All Notifications'}
           </button>
           {showStoredNotifications && (
             <div className="mt-4">
-              <h3 className="text-md font-semibold">All Notifications</h3>
               {storedNotifications.length > 0 ? (
                 storedNotifications.map((notif, index) => (
                   <div key={index} className="mb-4 p-2 border rounded">

@@ -9,4 +9,5 @@ router.get('/dashboard', verifyToken, (req, res, next) => { console.log("Trainer
 
 router.get('/your-clients', verifyToken, (req, res, next) => { console.log("Clients list router"); next(); }, acceptedClients);
 
+
 export default router;

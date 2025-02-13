@@ -49,8 +49,8 @@ const SearchPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <header className="bg-blue-600 text-white py-4">
-        <h1 className="text-center text-2xl font-bold">Find your trainer</h1>
+      <header className="text-black py-4">
+        <h1 className="text-center text-5xl font-bold">Find your trainer</h1>
         <div className="mt-4 flex justify-center">
           <input
             type="text"

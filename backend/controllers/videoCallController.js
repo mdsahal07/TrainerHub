@@ -1,80 +1,63 @@
-import { v4 as uuidv4 } from 'uuid';
 import VideoCall from '../models/VideoCall.js';
+import Notification from '../models/VcNotif.js';
 
-// Start a new call
-export const startCall = async (req, res) => {
+export const startVideoCall = async (req, res) => {
+	const { clientIds } = req.body;
+
+	if (!clientIds || !Array.isArray(clientIds)) {
+		return res.status(400).json({ message: 'Invalid client IDs' });
+	}
+
+	const roomName = `trainer-room-${Date.now()}`;
 	try {
-		const { role } = req.user; // Assume `req.user` exists
-		if (role !== 'trainer' && role !== 'client') {
-			return res.status(403).json({ message: 'Unauthorized role for starting a call.' });
-		}
+		const videoCall = new VideoCall({ roomName, clients: clientIds });
+		await videoCall.save();
 
-		const roomId = uuidv4(); // Generate unique room ID
-
-		const newCall = await VideoCall.create({
-			trainerId: role === 'trainer' ? req.user.id : null,
-			clientId: role === 'client' ? req.user.id : null,
-			roomId,
-			createdBy: req.user.id,
-			participants: [req.user.id],
-			scheduledTime: new Date(), // Example timestamp;
+		clientIds.forEach(async (clientId) => {
+			const notification = new Notification({
+				clientId,
+				message: `You have been invited to a video call. Room: ${roomName}`,
+				roomName,
+			});
+			await notification.save();
 		});
 
-		res.status(200).json({ roomId: newCall.roomId, message: 'Call started successfully.' });
-	} catch (error) {
-		console.error('Error starting call:', error);
-		res.status(500).json({ message: 'Error starting call.' });
+		res.status(200).json({ roomName });
+	} catch (err) {
+		res.status(500).json({ message: 'Failed to start video call', error: err.message });
 	}
 };
 
-// Join an existing call
-export const joinCall = async (req, res) => {
-
+export const getNotifications = async (req, res) => {
+	const { clientId } = req.params;
 	try {
-		const { roomId } = req.body;
-		const call = await VideoCall.findOne({ roomId, active: true });
-
-		if (!call) {
-			return res.status(404).json({ message: "Room not found or call inactive" });
-		}
-
-
-		if (!call.participants.includes(req.user.id)) {
-			call.participants.push(req.user.id);
-			await call.save(); // Save changes to DB
-		}
-
-		res.status(200).json({
-			roomId: call.roomId,
-			participants: call.participants,
-			message: 'Joined the call successfully.',
-		});
-	} catch (error) {
-
-		console.error('Error joining call:', error);
-		res.status(500).json({ message: 'Error joining call.' });
+		const notifications = await Notification.find({ clientId });
+		res.status(200).json(notifications);
+	} catch (err) {
+		res.status(500).json({ message: 'Failed to fetch notifications', error: err.message });
 	}
 };
 
-//End the call
-export const endCall = async (req, res) => {
+export const handleResponse = async (req, res) => {
+	const { clientId, roomName, response } = req.body;
+
+	if (!clientId || !roomName || !response) {
+		return res.status(400).json({ message: 'Invalid data' });
+	}
+
 	try {
-		const { roomId } = req.body;
-
-		// Find the call by roomId
-		const call = await VideoCall.findOne({ roomId });
-
-		if (!call) {
-			return res.status(404).json({ message: 'Room not found.' });
+		const videoCall = await VideoCall.findOne({ roomName });
+		if (!videoCall) {
+			return res.status(404).json({ message: 'Room not found' });
 		}
 
-		// Mark the call as inactive
-		call.active = false;
-		await call.save();
+		if (response === 'accept') {
+			videoCall.status = 'accepted';
+		}
 
-		res.status(200).json({ message: 'Call ended successfully.' });
-	} catch (error) {
-		console.error('Error ending call:', error);
-		res.status(500).json({ message: 'Error ending call.' });
+		await Notification.deleteOne({ clientId, roomName });
+		res.status(200).json({ message: 'Response recorded' });
+	} catch (err) {
+		res.status(500).json({ message: 'Failed to handle response', error: err.message });
 	}
 };

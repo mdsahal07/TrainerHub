@@ -39,6 +39,7 @@ const ClientList = ({ trainerId }) => {
           onClick={() => (window.location.href = `/clients/${client._id}`)}
           icon={<i className="fas fa-user"></i>}
         />
+
       ))}
     </div>
   );

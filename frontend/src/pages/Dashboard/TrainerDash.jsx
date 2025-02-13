@@ -1,47 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/Cards';
-import ProgressChart from '../../components/ProgressChart';
 import axios from 'axios';
 import ClientList from '../../components/YourClients.jsx';
+import Modal from '../../components/Modal.jsx';
+import VideoCall from '../../components/VideoCall.jsx';
 
 const TrainerDashboard = () => {
-  const [stats, setStats] = useState(null); // Trainer's stats (name, progress, etc.)
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const [chartData, setChartData] = useState(null); // Chart data
+  const [stats, setStats] = useState();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [selectedClients, setSelectedClients] = useState([]);
+  const [videoCallRoom, setVideoCallRoom] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get the token from localStorage
+        const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:5000/trainerDash/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const { name, progress, totalClients, pendingRequests } = response.data;
+        const { name, totalClients, pendingRequests, recentActivities, notifications, goals, upcomingSessions } = response.data;
 
         // Set data for dashboard
         setStats({ name, totalClients, pendingRequests });
-        setChartData({
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-          datasets: [
-            {
-              label: 'Client Progress Over Time',
-              data: progress || [5, 15, 25, 35],
-              borderColor: '#FFA726',
-              backgroundColor: 'rgba(255, 167, 38, 0.2)',
-            },
-          ],
-        });
+        setActivities(recentActivities || []); // Ensure recentActivities is an array
+        setNotifications(notifications || []); // Ensure notifications is an array
+        setGoals(goals || []); // Ensure goals is an array
+        setUpcomingSessions(upcomingSessions || []); // Ensure upcomingSessions is an array
         setLoading(false);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch dashboard data');
         setLoading(false);
       }
     };
+    const fetchAcceptedClients = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/trainerDash/your-clients', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setClients(response.data.clients || []);
+
+        console.log("Check clients : ", clients);
+      } catch (err) {
+        console.error('Failed to fetch clients:', err);
+      }
+    };
 
     fetchStats();
+    fetchAcceptedClients();
   }, []);
+
+  const handleAddClientClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleClientSelection = (clientId) => {
+    console.log("Selected client id : ", clientId);
+    setSelectedClients((prev) =>
+
+      prev.includes(clientId) ? prev.filter((id) => id !== clientId) : [...prev, clientId]
+    );
+  };
+
+  const handleStartVideoCall = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        'http://localhost:5000/videoCall/start',
+        { clientIds: selectedClients },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      // Close the modal and reset selected clients
+      setIsModalOpen(false);
+      setSelectedClients([]);
+      setVideoCallRoom(`trainer-room-${Date.now()}`); // Generate a unique room name
+    } catch (err) {
+      console.error('Failed to start video call:', err);
+    }
+  };
 
   const cards = [
     {
@@ -64,44 +110,23 @@ const TrainerDashboard = () => {
     },
   ];
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading) return <div className="flex justify-center items-center h-screen"><p className="text-xl">Loading...</p></div>;
+  if (error) return <div className="flex justify-center items-center h-screen"><p className="text-xl text-red-500">{error}</p></div>;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8 relative z-10">
+    <div className="bg-gradient-to-b from-gray-50 to-gray-200 min-h-screen p-8">
       {/* Header */}
-      <header className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-light">
+      <header className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-semibold text-gray-800">
           Welcome back, {stats?.name || 'Trainer'}!
         </h2>
-        {stats?.profilePicture ? (
-          <img
-            src={stats.profilePicture}
-            alt="Profile"
-            className="h-10 w-10 rounded-full cursor-pointer"
-            onClick={() => (window.location.href = '/profile')} // Navigate to profile page
-          />
-        ) : (
-          <div
-            className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 cursor-pointer"
-            onClick={() => (window.location.href = '/profile')} // Navigate to profile page
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              className="h-6 w-6"
-            >
-              <path
-                d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-2.7 0-8.4 1.4-8.4 4.2v1.2c0 .6.6 1.2 1.2 1.2h14.4c.6 0 1.2-.6 1.2-1.2v-1.2c0-2.8-5.7-4.2-8.4-4.2z"
-              />
-            </svg>
-          </div>
-        )}
+        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200">
+          Update Profile
+        </button>
       </header>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((card, index) => (
           <Card
             key={index}
@@ -113,21 +138,80 @@ const TrainerDashboard = () => {
         ))}
       </div>
 
-      {/* Progress Chart */}
-      <div className="mt-8 bg-white p-4 shadow rounded">
-        <h3 className="text-lg font-semibold mb-4">Client Progress Overview</h3>
-        <div className="h-64 flex justify-center items-center border rounded">
-          <ProgressChart data={chartData} title="Progress of Your Clients" />
+      {/* Statistics */}
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h3 className="text-xl font-semibold mb-4">Sessions This Week</h3>
+          <p className="text-3xl">{stats?.sessionsThisWeek || 0}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center space-x-2">
+              <i className="fas fa-video text-3xl text-blue-500"></i>
+              <h3 className="text-xl font-semibold">Video Call</h3>
+            </div>
+            <button className="bg-blue-500 text-white px-2 py-1 rounded-full shadow-md hover:bg-blue-600 transition duration-200"
+              onClick={handleAddClientClick}
+            >
+              + Add Client
+            </button>
+          </div>
+          <p className="text-gray-600">Schedule and manage video calls with your clients.</p>
         </div>
       </div>
 
-      {/*Your Clients */}
-      <div id="client-list-section" className="mt-8 bg-white p-4 shadow rounded">
+      {/* Your Clients */}
+      <div id="client-list-section" className="mt-12 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Your Clients</h3>
+          <h3 className="text-2xl font-semibold">Your Clients</h3>
         </div>
         <ClientList trainerId={stats?.trainerId} />
       </div>
+
+
+      {/* Recent Activities */}
+      <div className="mt-12 p-8 bg-white rounded-lg shadow-lg">
+        <h3 className="text-2xl font-semibold mb-4">Recent Activities</h3>
+        <ul className="list-disc pl-5">
+          {activities.map((activity, index) => (
+            <li key={index} className="mb-2">{activity}</li>
+          ))}
+        </ul>
+      </div>
+
+
+      {/* Upcoming Sessions */}
+      <div className="mt-12 p-8 bg-white rounded-lg shadow-lg">
+        <h3 className="text-2xl font-semibold mb-4">Upcoming Sessions</h3>
+        <ul className="list-disc pl-5">
+          {upcomingSessions.map((session, index) => (
+            <li key={index} className="mb-2">{session}</li>
+          ))}
+        </ul>
+      </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h3 className="text-2xl font-semibold mb-4">Select Clients for Video Call</h3>
+        <ul className="list-disc pl-5 max-h-64 overflow-y-auto">
+          {clients.map((client) => (
+            <li key={client._id} className="mb-2 flex items-center">
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={selectedClients.includes(client._id)}
+                onChange={() => handleClientSelection(client._id)}
+              />
+              {client.username}
+            </li>
+          ))}
+        </ul>
+        <button
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+          onClick={handleStartVideoCall}
+        >
+          Start Video Call
+        </button>
+      </Modal>
+      {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
     </div>
   );
 };
