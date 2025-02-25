@@ -1,5 +1,6 @@
 import VideoCall from '../models/VideoCall.js';
 import Notification from '../models/VcNotif.js';
+import { io } from '../server.js';
 
 export const startVideoCall = async (req, res) => {
 	const { clientIds } = req.body;
@@ -20,6 +21,13 @@ export const startVideoCall = async (req, res) => {
 				roomName,
 			});
 			await notification.save();
+
+			io.to(clientId).emit('receiveNotification', {
+				type: 'videoCall',
+				roomName,
+				description: 'You have been invited to a video call',
+				link: `/video-call/${roomName}`,
+			});
 		});
 
 		res.status(200).json({ roomName });

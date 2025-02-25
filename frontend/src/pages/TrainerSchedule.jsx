@@ -60,34 +60,37 @@ const TrainerSchedule = () => {
     }
   };
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Manage Schedule</h2>
-      <CalendarComponent selectedDate={selectedDate} setSelectedDate={handleDateClick} />
-      <div className="mt-4">
-        <h3 className="text-xl font-bold mb-2">Time Slots for {selectedDate.toDateString()}</h3>
-        {timeSlots.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4">
+    <div className="bg-gray-300">
+      <div className="p-4">
+        <h2 className="flex justify-center text-4xl font-bold font-extrabold mb-4">Manage Schedule</h2>
+        <CalendarComponent selectedDate={selectedDate} setSelectedDate={handleDateClick} />
+        <h3 className=" text-2xl font-bold mb-2">Time Slots for {selectedDate.toDateString()}</h3>
+        <button onClick={() => setShowForm(true)} className="bg-green-500 text-white p-2 rounded-lg">Add Slot +</button>
+        <div className="mt-4 flex ">
+          {timeSlots.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4">
 
-            {timeSlots.map(slot => (
-              < TimeSlot key={slot._id} slot={slot} deleteSlot={deleteSlot} />
-            ))}
-          </div>
-        ) : (
-          <div>
-            <p>No slots booked for this date.</p>
-          </div>
-        )}
-        {showForm && (
-          <TimeSlotForm
-            trainerId={trainerId}
-            selectedDate={selectedDate}
-            onClose={() => setShowForm(false)}
-            addNewSlot={addNewSlot}
-          />
-        )}
+              {timeSlots.map(slot => (
+                < TimeSlot key={slot._id} slot={slot} deleteSlot={deleteSlot} />
+              ))}
+            </div>
+          ) : (
+            <div>
+              <p>No slots booked for this date.</p>
+            </div>
+
+          )}
+          {showForm && (
+            <TimeSlotForm
+              trainerId={trainerId}
+              selectedDate={selectedDate}
+              onClose={() => setShowForm(false)}
+              addNewSlot={addNewSlot}
+            />
+          )}
+        </div>
+
       </div>
-
-      <button onClick={() => setShowForm(true)} className="bg-green-500 text-white p-2 rounded">+</button>
     </div>
   );
 };

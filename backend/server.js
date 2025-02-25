@@ -18,7 +18,7 @@ import trainerDash from './routes/trainer/trainerDash.js';
 import handleReq from './routes/handleReq.js';
 import scheduler from './routes/trainer/scheduleRoute.js';
 import notification from './routes/notify.js';
-
+import clientProf from './routes/trainer/clientProf.js';
 
 const app = express();
 const server = http.createServer(app); //creating http server for socket.io
@@ -45,6 +45,7 @@ app.use("/videocall", videoCallRoute);
 app.use("/request", handleReq);
 app.use("/schedule", scheduler);
 app.use("/notify", notification);
+app.use("/clients", clientProf);
 
 // WebSocket Setup
 socketHandler(io)
@@ -58,4 +59,4 @@ mongoose.connect(process.env.MONGO_URI)
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT} `));
 
-
+export { io, server }

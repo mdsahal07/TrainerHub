@@ -35,45 +35,56 @@ const TimeSlotForm = ({ trainerId, selectedDate, onClose, addNewSlot }) => {
 	};
 
 	return (
-		<div className="p-4 border rounded shadow">
+		<div className="p-6 bg-white border border-gray-200 rounded-lg shadow-lg">
+			<h3 className="text-xl font-semibold mb-4">Add New Time Slot</h3>
 			<form onSubmit={handleSubmit}>
-				<div>
-					<label>Start Time:</label>
+				<div className="mb-4">
+					<label className="block text-gray-700 mb-2">Start Time</label>
 					<input
 						type="time"
 						value={startTime}
 						onChange={(e) => setStartTime(e.target.value)}
+						className="w-full p-2 border rounded-md"
 						required
 					/>
 				</div>
-				<div>
-					<label>End Time:</label>
+				<div className="mb-4">
+					<label className="block text-gray-700 mb-2">End Time</label>
 					<input
 						type="time"
 						value={endTime}
 						onChange={(e) => setEndTime(e.target.value)}
+						className="w-full p-2 border rounded-md"
 						required
 					/>
 				</div>
-				<div>
-					<label>Client Name:</label>
+				<div className="mb-4">
+					<label className="block text-gray-700 mb-2">Client Name</label>
 					<input
 						type="text"
 						value={clientName}
 						onChange={(e) => setClientName(e.target.value)}
+						className="w-full p-2 border rounded-md"
 						required
 					/>
 				</div>
-				<div>
-					<label>Description:</label>
+				<div className="mb-4">
+					<label className="block text-gray-700 mb-2">Description</label>
 					<textarea
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
+						className="w-full p-2 border rounded-md"
 						required
 					/>
 				</div>
-				<button type="submit">Save Slot</button>
-				<button type="button" onClick={onClose}>Cancel</button>
+				<div className="flex justify-end space-x-2">
+					<button type="button" onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+						Cancel
+					</button>
+					<button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+						Save Slot
+					</button>
+				</div>
 			</form>
 		</div>
 	);

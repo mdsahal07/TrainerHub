@@ -9,7 +9,7 @@ const trainerSchema = new mongoose.Schema({
 	rating: { type: Number, default: 0 },
 	bio: { type: String, default: " " },
 	specialization: { type: String, default: " " },
-	certification: { type: String, default: " " },
+	qualifications: { type: String, default: " " },
 	experience: { type: String, default: "" },
 	availability: { type: String },
 	connection: [

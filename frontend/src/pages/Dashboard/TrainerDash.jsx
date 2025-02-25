@@ -4,6 +4,7 @@ import axios from 'axios';
 import ClientList from '../../components/YourClients.jsx';
 import Modal from '../../components/Modal.jsx';
 import VideoCall from '../../components/VideoCall.jsx';
+import ProfileUpdate from '../../components/Profile.jsx';
 
 const TrainerDashboard = () => {
   const [stats, setStats] = useState();
@@ -17,6 +18,7 @@ const TrainerDashboard = () => {
   const [clients, setClients] = useState([]);
   const [selectedClients, setSelectedClients] = useState([]);
   const [videoCallRoom, setVideoCallRoom] = useState(null);
+  const [isProfileModal, setProfileUpdateModal] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -89,6 +91,10 @@ const TrainerDashboard = () => {
     }
   };
 
+  const handleProfileUpdate = () => {
+    setProfileUpdateModal(true);
+  }
+
   const cards = [
     {
       title: 'Your Clients',
@@ -110,7 +116,7 @@ const TrainerDashboard = () => {
     },
   ];
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><p className="text-xl">Loading...</p></div>;
+  if (loading) return <div className="flex justify-center items-center h-screen">< p className="text-xl" > Loading...</p ></div >;
   if (error) return <div className="flex justify-center items-center h-screen"><p className="text-xl text-red-500">{error}</p></div>;
 
   return (
@@ -118,9 +124,10 @@ const TrainerDashboard = () => {
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-semibold text-gray-800">
-          Welcome back, {stats?.name || 'Trainer'}!
+          Welcome back, {stats?.name || 'Trainerr'}!
         </h2>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200">
+        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+          onClick={handleProfileUpdate}>
           Update Profile
         </button>
       </header>
@@ -212,6 +219,11 @@ const TrainerDashboard = () => {
         </button>
       </Modal>
       {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
+
+      <ProfileUpdate
+        isOpen={isProfileModal}
+        onClose={() => setProfileUpdateModal(false)}
+      />
     </div>
   );
 };

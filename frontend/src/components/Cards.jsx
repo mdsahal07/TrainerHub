@@ -13,7 +13,6 @@ const Cards = ({ title, description, path, icon }) => {
         <div>
           <h3 className="text-lg font-bold">{title}</h3>
           <p className="text-gray-600">{description}</p>
-
         </div>
       </div>
 

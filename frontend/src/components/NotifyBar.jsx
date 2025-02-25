@@ -12,7 +12,6 @@ const NotifyBar = ({ visible, onClose }) => {
     try {
       const response = await fetch(`http://localhost:5000/notify/${userId}`);
       const data = await response.json();
-      console.log("Stored Notifications fetched: ", data);
       setStoredNotifications(data);
     } catch (error) {
       console.error('Error fetching stored notifications:', error);
@@ -23,7 +22,6 @@ const NotifyBar = ({ visible, onClose }) => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
-      console.log("Decoded Token: ", decodedToken);
       setUserId(decodedToken.userId);
     }
   }, []);

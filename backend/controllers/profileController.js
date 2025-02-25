@@ -1,4 +1,3 @@
-
 import Client from '../models/Client.js';
 import Trainer from '../models/Trainer.js';
 
@@ -23,7 +22,7 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
 
-	const { fname, username, bio, goals, qualifications, experience, availability, profilePic } = req.body;
+	const { fname, username, bio, goals, qualifications, experience, availability, specialization, profilePic } = req.body;
 
 	try {
 		let user;
@@ -47,6 +46,7 @@ export const updateProfile = async (req, res) => {
 		if (req.user.role === 'client') {
 			user.goals = goals || user.goals;
 		} else if (req.user.role === 'trainer') {
+			user.specialization = specialization || user.specialization;
 			user.qualifications = qualifications || user.qualifications;
 			user.experience = experience || user.experience;
 			user.availability = availability || user.availability;

@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 // Check connection status
 export const reqStatus = async (req, res) => {
 	const clientId = req.user.id;
-	console.log("clientId : ", clientId);
 	const trainerId = req.params.trainerId;
 
 	try {
@@ -14,7 +13,7 @@ export const reqStatus = async (req, res) => {
 			return res.json({ status: connection.status });
 		}
 
-		return res.json({ status: 'request' }); // Default status if no connection exists
+		return res.json({ status: 'request' });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: 'Failed to fetch connection status' });
@@ -62,10 +61,9 @@ export const cancelReq = async (req, res) => {
 	}
 };
 
-// Accept or Decline a connection request
 export const respondReq = async (req, res) => {
-	const trainerId = req.user.id; // Trainer should be authenticated here
-	const { clientId, action } = req.body; // action can be 'accept' or 'decline'
+	const trainerId = req.user.id;
+	const { clientId, action } = req.body;
 
 	try {
 		const connection = await Request.findOne({ clientId, trainerId, status: 'requested' });
@@ -92,15 +90,12 @@ export const respondReq = async (req, res) => {
 };
 
 
-// Fetch all connection requests for the trainer
 export const trainerReq = async (req, res) => {
-	const trainerId = req.user.id; // Trainer must be authenticated
-	console.log("Trainer id : ", trainerId);
+	const trainerId = req.user.id;
 	try {
 		const requests = await Request.find({ trainerId, status: 'requested' })
-			.populate('clientId', 'fname lname email') // Populate client details
+			.populate('clientId', 'fname email')
 			.sort({ createdAt: -1 });
-
 		res.json(requests);
 	} catch (error) {
 		console.error(error);

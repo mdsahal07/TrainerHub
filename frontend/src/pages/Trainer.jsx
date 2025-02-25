@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { ReqButton } from '../components/ReqButton.jsx'; // Import the ReqButton component
+import { ReqButton } from '../components/ReqButton.jsx';
 
 const TrainerProfile = () => {
   const { id } = useParams();
@@ -39,7 +39,7 @@ const TrainerProfile = () => {
         <p>Availability: {trainer.availability ? 'Available' : 'Not Available'}</p>
 
         {/* Conditionally render the ReqButton if the trainer is available */}
-        {trainer.availability && <ReqButton trainerId={trainer._id} />}
+        {trainer.availability && <ReqButton trainerId={trainer} />}
       </div>
     )
   );

@@ -37,7 +37,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/user/profile" element={<Profile />} />
+        <Route path="/profile/update" element={<Profile />} />
         <Route path="/trainer/:id" element={<Trainer />} />
         <Route path="/search/top-trainers" element={<ExploreTrainers />} />
         <Route path="/video-call/:roomId" element={<VideoCall />} />

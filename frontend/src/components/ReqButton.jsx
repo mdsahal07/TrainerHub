@@ -49,7 +49,13 @@ export const ReqButton = ({ trainerId }) => {
 
 	return (
 		<button
-			className={`req-button req-${status}`}
+			className={`
+        px-4 py-2 rounded-lg transition duration-200
+        ${status === 'request' && 'bg-blue-500 text-white hover:bg-blue-600'}
+        ${status === 'requested' && 'bg-blue-900 text-white hover:bg-gray-800'}
+        ${status === 'accepted' && 'bg-green-500 text-white cursor-not-allowed'}
+        ${status === 'declined' && 'bg-red-500 text-white cursor-not-allowed'}
+      `}
 			onClick={handleClick}
 			disabled={status === 'accepted' || status === 'declined'}
 		>

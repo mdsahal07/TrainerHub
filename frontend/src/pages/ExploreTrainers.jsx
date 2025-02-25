@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import TrainerProfile from '../components/TrainerProf.jsx';
 
 const SearchPage = () => {
 
@@ -9,6 +10,7 @@ const SearchPage = () => {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedTrainer, setSelectedTrainer] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +48,9 @@ const SearchPage = () => {
       fetchFilteredTrainers();
     }
   }, [filters, searchQuery]); // Runs whenever filters or searchQuery change
-
+  const handleTrainerClick = (trainer) => {
+    setSelectedTrainer(trainer)
+  };
   return (
     <div className="bg-gray-50 min-h-screen">
       <header className="text-black py-4">
@@ -111,7 +115,7 @@ const SearchPage = () => {
               <div
                 key={trainer._id}
                 className="bg-white shadow-md rounded-md p-4 flex flex-col items-start"
-                onClick={() => navigate(`/trainer/${trainer._id}`)}
+                onClick={() => handleTrainerClick(trainer)}
               >
                 <h3 className="font-semibold text-lg">{trainer.fname}</h3>
                 <p className="text-gray-600">{trainer.specialization}</p>
@@ -121,6 +125,9 @@ const SearchPage = () => {
           </div>
         </section>
       </div >
+      {selectedTrainer && (
+        <TrainerProfile trainer={selectedTrainer} onClose={() => setSelectedTrainer(null)} />
+      )}
     </div >
   );
 };

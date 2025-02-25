@@ -3,11 +3,10 @@ import Client from '../../models/Client.js';
 import Request from '../../models/Request.js';
 
 export const getTrainerDashboard = async (req, res) => {
-	const trainerId = req.user.id; // Assuming the authenticated trainer's ID is in `req.user.id`
-
+	const trainerId = req.user.id;
 	try {
 		// Fetch trainer's name and profile picture
-		const trainer = await Trainer.findById(trainerId).select('name profilePicture');
+		const trainer = await Trainer.findById(trainerId).select('fname');
 		if (!trainer) {
 			return res.status(404).json({ message: 'Trainer not found' });
 		}
@@ -25,8 +24,7 @@ export const getTrainerDashboard = async (req, res) => {
 		const progress = [5, 15, 25, 35]; // Example: Progress over weeks
 
 		res.status(200).json({
-			name: trainer.name,
-			profilePicture: trainer.profilePicture,
+			name: trainer.fname,
 			totalClients,
 			pendingRequests,
 			progress,

@@ -31,7 +31,7 @@ function Login() {
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       if (error.response && error.response.status === 400) {
-        setErrorMessage("Wrong password. Please try again.");
+        setErrorMessage("Incorrect email or password. Please try again.");
       } else {
         setErrorMessage("An error occurred. Please try again.");
       }

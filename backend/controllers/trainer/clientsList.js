@@ -4,7 +4,7 @@ import Request from '../../models/Request.js'; // Import the Request model
 export const acceptedClients = async (req, res) => {
 	try {
 		const trainerId = req.user.id; // Trainer ID from authenticated user
-
+		console.log("Trainer Id : ", trainerId);
 		// Find all requests where the trainer has accepted the client
 		const acceptedRequests = await Request.find({
 			trainerId,

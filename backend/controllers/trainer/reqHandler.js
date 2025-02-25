@@ -1,6 +1,6 @@
 import Request from '../../models/Request.js';
 import Client from '../../models/Client.js'
-// Get pending requests for a trainer
+
 export const getPendingRequests = async (req, res) => {
 	try {
 		const { trainerId } = req.params;
