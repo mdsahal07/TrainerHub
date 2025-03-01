@@ -1,10 +1,29 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
-	clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-	message: { type: String, required: true },
-	roomName: { type: String, required: true },
-}, { timestamps: true });
+	recipientId: {
+		type: mongoose.Schema.Types.ObjectId,
+		required: true,
+		refPath: 'recipientModel',
+	},
+	recipientModel: {
+		type: String,
+		required: true,
+		enum: ['Trainer', 'Client'],
+	},
+	message: {
+		type: String,
+		required: true,
+	},
+	read: {
+		type: Boolean,
+		default: false,
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+	},
+});
 
 const VcNotif = mongoose.model('VcNotif', notificationSchema);
 

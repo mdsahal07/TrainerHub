@@ -5,6 +5,7 @@ import ClientList from '../../components/YourClients.jsx';
 import Modal from '../../components/Modal.jsx';
 import VideoCall from '../../components/VideoCall.jsx';
 import ProfileUpdate from '../../components/Profile.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const TrainerDashboard = () => {
   const [stats, setStats] = useState();
@@ -17,8 +18,10 @@ const TrainerDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clients, setClients] = useState([]);
   const [selectedClients, setSelectedClients] = useState([]);
-  const [videoCallRoom, setVideoCallRoom] = useState(null);
+  const [videoCallRoom, setVideoCallRoom] = useState('');
   const [isProfileModal, setProfileUpdateModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -32,10 +35,10 @@ const TrainerDashboard = () => {
 
         // Set data for dashboard
         setStats({ name, totalClients, pendingRequests });
-        setActivities(recentActivities || []); // Ensure recentActivities is an array
-        setNotifications(notifications || []); // Ensure notifications is an array
-        setGoals(goals || []); // Ensure goals is an array
-        setUpcomingSessions(upcomingSessions || []); // Ensure upcomingSessions is an array
+        setActivities(recentActivities || []);
+        setNotifications(notifications || []);
+        setGoals(goals || []);
+        setUpcomingSessions(upcomingSessions || []);
         setLoading(false);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch dashboard data');
@@ -48,8 +51,8 @@ const TrainerDashboard = () => {
         const response = await axios.get('http://localhost:5000/trainerDash/your-clients', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("Response data : ", response.data.clients);
         setClients(response.data.clients || []);
-
         console.log("Check clients : ", clients);
       } catch (err) {
         console.error('Failed to fetch clients:', err);
@@ -65,7 +68,6 @@ const TrainerDashboard = () => {
   };
 
   const handleClientSelection = (clientId) => {
-    console.log("Selected client id : ", clientId);
     setSelectedClients((prev) =>
 
       prev.includes(clientId) ? prev.filter((id) => id !== clientId) : [...prev, clientId]
@@ -75,17 +77,20 @@ const TrainerDashboard = () => {
   const handleStartVideoCall = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(
+      const response = await axios.post(
         'http://localhost:5000/videoCall/start',
         { clientIds: selectedClients },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Close the modal and reset selected clients
+      console.log("Response data :", response.data);
+      const { roomName } = response.data;
+      console.log("Roomname : ", roomName);
       setIsModalOpen(false);
       setSelectedClients([]);
-      setVideoCallRoom(`trainer-room-${Date.now()}`); // Generate a unique room name
+      setVideoCallRoom(roomName);
+      console.log("Video call room : ", videoCallRoom);
     } catch (err) {
       console.error('Failed to start video call:', err);
     }
@@ -132,7 +137,6 @@ const TrainerDashboard = () => {
         </button>
       </header>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((card, index) => (
           <Card
@@ -145,7 +149,10 @@ const TrainerDashboard = () => {
         ))}
       </div>
 
-      {/* Statistics */}
+      {selectedClient && (
+        <ClientProf client={selectedClient} onClose={() => setSelectedClient(null)} />
+      )}
+
       <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-xl font-semibold mb-4">Sessions This Week</h3>
@@ -167,7 +174,7 @@ const TrainerDashboard = () => {
         </div>
       </div>
 
-      {/* Your Clients */}
+
       <div id="client-list-section" className="mt-12 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-semibold">Your Clients</h3>
@@ -186,6 +193,7 @@ const TrainerDashboard = () => {
         </ul>
       </div>
 
+      {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
 
       {/* Upcoming Sessions */}
       <div className="mt-12 p-8 bg-white rounded-lg shadow-lg">
@@ -218,13 +226,13 @@ const TrainerDashboard = () => {
           Start Video Call
         </button>
       </Modal>
-      {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
-
       <ProfileUpdate
         isOpen={isProfileModal}
         onClose={() => setProfileUpdateModal(false)}
       />
+
     </div>
+
   );
 };
 

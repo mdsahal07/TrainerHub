@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Client from '../models/Client.js';
 import Trainer from '../models/Trainer.js';
+import Admin from '../models/Admin.js';
 import sendEmail from '../sendEmail.js';
 
 const findUserByEmail = async (email) => {
@@ -23,7 +24,7 @@ export const getUserDetails = async (req, res) => {
 		res.json(user);
 	} catch (error) {
 		res.status(500).json({ message: 'Server error' });
-	}
+	};
 };
 //Registering a new user
 export const register = async (req, res) => {
@@ -61,21 +62,40 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
 	const { email, password } = req.body;
 	try {
-		const [client, trainer] = await Promise.all([
+
+		const [client, trainer, admin] = await Promise.all([
 			Client.findOne({ email }),
-			Trainer.findOne({ email })
+			Trainer.findOne({ email }),
+			Admin.findOne({ email })
 		]);
-
-		const user = client || trainer;
-
+		const user = client || trainer || admin;
 		if (!user) return res.status(400).json({ message: "User not found" });
-
-		const role = client ? "client" : "trainer";
-		const isPasswordValid = await bcrypt.compare(password, user.password);
+		console.log("user : ", user);
+		let role;
+		switch (user.role) {
+			case "admin":
+				role = "admin";
+				break;
+			case "trainer":
+				role = "trainer"
+				break;
+			case "client":
+				role = "client"
+				break;
+			default:
+				role = "invalid"
+		}
+		console.log("Role : ", role);
+		let isPasswordValid;
+		if (role === "admin") {
+			isPasswordValid = (password === user.password);
+		} else {
+			isPasswordValid = await bcrypt.compare(password, user.password);
+		}
+		console.log(`is password valid : ${isPasswordValid}`);
 		if (!isPasswordValid) return res.status(400).json({ message: "Incorrect password" });
 
 		const token = jwt.sign({ userId: user._id, role }, process.env.JWT_TOKEN, { expiresIn: "7d" });
-
 		let redirectURL;
 		switch (role) {
 			case "client":

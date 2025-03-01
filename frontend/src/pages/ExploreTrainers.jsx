@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import TrainerProfile from '../components/TrainerProf.jsx';
 
 const SearchPage = () => {
@@ -11,7 +10,6 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDefaultTrainers = async () => {
@@ -19,15 +17,15 @@ const SearchPage = () => {
       setError('');
       try {
         const res = await axios.get('http://localhost:5000/search/top-trainers');
-        setTrainers(res.data); // Set default leaderboard to trainers list
+        setTrainers(res.data);
         console.log(res.data)
       } catch (err) {
-        setError('Failed to fetch trainers'); // Handle errors appropriately
+        setError('Failed to fetch trainers');
       }
       setLoading(false);
     };
 
-    fetchDefaultTrainers(); // Fetch data when the component mounts
+    fetchDefaultTrainers();
   }, []);
 
   useEffect(() => {
@@ -47,10 +45,12 @@ const SearchPage = () => {
     if (filters.specialization || filters.minRating || searchQuery) {
       fetchFilteredTrainers();
     }
-  }, [filters, searchQuery]); // Runs whenever filters or searchQuery change
+  }, [filters, searchQuery]);
+
   const handleTrainerClick = (trainer) => {
     setSelectedTrainer(trainer)
   };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <header className="text-black py-4">

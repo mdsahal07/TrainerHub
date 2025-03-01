@@ -9,13 +9,15 @@ import ExploreTrainers from "./pages/ExploreTrainers";
 import ClientDashboard from "./pages/Dashboard/ClientDash";
 import TrainerDashboard from "./pages/Dashboard/TrainerDash";
 import AdminDashboard from "./pages/Dashboard/AdminDash";
-import VideoCall from "./components/VideoCall";
+import VideoCall from "./components/VideoCallRoom.jsx";
 import PendingReq from "./pages/PendingReq";
 import TrainerSchedule from "./pages/TrainerSchedule.jsx";
 import Navbar from "./components/Navbar.jsx";
 import NotifyBar from "./components/NotifyBar.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import ClientList from "./pages/admin/ClientList.jsx";
+import TrainerList from "./pages/admin/TrainerList.jsx";
 
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -40,12 +42,14 @@ function App() {
         <Route path="/profile/update" element={<Profile />} />
         <Route path="/trainer/:id" element={<Trainer />} />
         <Route path="/search/top-trainers" element={<ExploreTrainers />} />
-        <Route path="/video-call/:roomId" element={<VideoCall />} />
+        <Route path="dashboard/trainer/video-call/:roomId" element={<VideoCall />} />
         <Route path="/dashboard/client" element={<ClientDashboard />} />
         <Route path="/dashboard/trainer" element={<TrainerDashboard />} />
         <Route path="/pending-req" element={<PendingReq />} />
         <Route path="/schedule/:traineId" element={<TrainerSchedule />} />
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
+        <Route path="/clients" element={<ClientList />} />
+        <Route path="/trainers" element={<TrainerList />} />
       </Routes>
     </Router>
   )

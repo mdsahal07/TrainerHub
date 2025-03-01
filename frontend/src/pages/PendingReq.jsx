@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ClientProf from '../components/ClientProf';
 
@@ -8,7 +7,6 @@ const PendingRequests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedClient, setSelectedClient] = useState();
-  const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   useEffect(() => {

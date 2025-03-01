@@ -1,17 +1,17 @@
 import mongoose from 'mongoose';
 
-const videoCallSchema = new mongoose.Schema({
-	trainerId: {
+const reportSchema = new mongoose.Schema({
+	who: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Trainer',
 		required: true,
 	},
-	clientIds: [{
+	client: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Client',
 		required: true,
-	}],
-	roomName: {
+	},
+	reason: {
 		type: String,
 		required: true,
 	},
@@ -21,6 +21,6 @@ const videoCallSchema = new mongoose.Schema({
 	},
 });
 
-const VideoCall = mongoose.model('VideoCall', videoCallSchema);
+const Report = mongoose.model('Report', reportSchema);
 
-export default VideoCall;
+export default Report;

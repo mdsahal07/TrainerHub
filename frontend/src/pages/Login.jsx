@@ -21,6 +21,7 @@ function Login() {
     try {
       const response = await axios.post("http://localhost:5000/auth/login", userData);
       const { redirectURL, token } = response.data;
+      console.log("Redirect url : ", redirectURL);
       if (redirectURL) {
         localStorage.setItem("token", token);
 

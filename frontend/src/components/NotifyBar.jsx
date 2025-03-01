@@ -7,6 +7,7 @@ const NotifyBar = ({ visible, onClose }) => {
   const [storedNotifications, setStoredNotifications] = useState([]);
   const [userId, setUserId] = useState('');
   const [showStoredNotifications, setShowStoredNotifications] = useState(false);
+  const [vcNotif, setVcNotif] = useState([]);
 
   const loadNotifications = async () => {
     try {
@@ -25,6 +26,7 @@ const NotifyBar = ({ visible, onClose }) => {
       setUserId(decodedToken.userId);
     }
   }, []);
+
 
   useEffect(() => {
     if (userId) {

@@ -1,23 +1,41 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { JitsiMeeting } from '@jitsi/react-sdk';
 
 const VideoCall = ({ roomName }) => {
-	const jitsiContainerRef = useRef(null);
-
-	useEffect(() => {
-		const domain = 'meet.jit.si';
-		const options = {
-			roomName: roomName,
-			width: '100%',
-			height: '100%',
-			parentNode: jitsiContainerRef.current,
-		};
-
-		const api = new window.JitsiMeetExternalAPI(domain, options);
-
-		return () => api.dispose();
-	}, [roomName]);
-
-	return <div ref={jitsiContainerRef} style={{ height: '100vh', width: '100%' }} />;
+	console.log("room Name 1 : ", roomName);
+	return (
+		<div style={{ height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<div style={{ height: '100%', width: '100%' }}>
+				<JitsiMeeting
+					domain="meet.jit.si"
+					roomName={roomName}
+					configOverwrite={{
+						startWithAudioMuted: true,
+						startWithVideoMuted: true,
+					}}
+					interfaceConfigOverwrite={{
+						TOOLBAR_BUTTONS: [
+							'microphone', 'camera', 'desktop', 'fullscreen',
+							'fodeviceselection', 'hangup', 'profile', 'chat',
+							'recording', 'livestreaming', 'etherpad', 'sharedvideo',
+							'settings', 'raisehand', 'videoquality', 'filmstrip',
+							'invite', 'feedback', 'stats', 'shortcuts', 'tileview',
+							'videobackgroundblur', 'download', 'help', 'mute-everyone',
+							'e2ee'
+						]
+					}}
+					userInfo={{
+						displayName: 'User Name',
+						email: 'user@example.com'
+					}}
+					getIFrameRef={iframeRef => {
+						iframeRef.style.height = '100%';
+						iframeRef.style.width = '100%';
+					}}
+				/>
+			</div>
+		</div>
+	);
 };
 
 export default VideoCall;

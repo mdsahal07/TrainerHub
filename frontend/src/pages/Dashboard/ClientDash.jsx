@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/Cards';
 import axios from 'axios';
-import Modal from '../../components/Modal.jsx';
-import VideoCall from '../../components/VideoCall.jsx';
 import NotifyBar from '../../components/NotifyBar.jsx';
 import socket from '../../socket.js';
 import ProfileUpdate from '../../components/Profile.jsx';
+import TrainerList from '../../components/YourTrainer.jsx';
+import { jwtDecode } from 'jwt-decode';
+import VcNotif from '../../components/VcNotif.jsx';
+import VideoCall from '../../components/VideoCall.jsx';
+import NotificationModal from '../../components/VcNotification.jsx';
 
 const ClientDashboard = () => {
   const [stats, setStats] = useState();
@@ -17,6 +20,7 @@ const ClientDashboard = () => {
   const [videoCallRoom, setVideoCallRoom] = useState(null); // State for video call room
   const [notifyBarVisible, setNotifyBarVisible] = useState(false); // State for notification bar
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -37,19 +41,6 @@ const ClientDashboard = () => {
       }
     };
 
-    const fetchVideoCallRoom = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/clientDash/videoCallRoom', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const { roomName } = response.data;
-        setVideoCallRoom(roomName);
-      } catch (err) {
-        console.error('Failed to fetch video call room:', err);
-      }
-    };
 
     const fetchTrainers = async () => {
       try {
@@ -65,16 +56,33 @@ const ClientDashboard = () => {
     };
 
     fetchStats();
-    fetchVideoCallRoom();
     fetchTrainers();
   }, []);
 
+  const token = localStorage.getItem('token');
+  const decodeToken = jwtDecode(token);
+  const userId = decodeToken.userId;
+  const userModel = decodeToken.role;
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:5000/videocall/${userId}/${userModel}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(response.data);
+      console.log("notifications : ", notifications);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    }
+  };
+
   useEffect(() => {
-    // Handle incoming notifications
+
     const handleReceiveNotification = (notification) => {
       console.log("Live Notification: ", notification);
       if (notification.type === 'videoCall') {
-        setVideoCallRoom(notification.roomName);
         setNotifyBarVisible(true);
       }
     };
@@ -86,35 +94,26 @@ const ClientDashboard = () => {
       socket.off('receiveNotification', handleReceiveNotification);
     };
   }, []);
-
   const handleMeetingClick = () => {
-    setIsModalOpen(true);
+    fetchNotifications();
   };
 
-  const handleTrainerSelection = (trainerId) => {
-    setSelectedTrainer(trainerId);
-  };
 
-  const handleStartVideoCall = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'http://localhost:5000/clientDash/startVideoCall',
-        { trainerId: selectedTrainer },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const { roomName } = response.data;
-      setIsModalOpen(false);
-      setVideoCallRoom(roomName);
-    } catch (err) {
-      console.error('Failed to start video call:', err);
-    }
+
+  const handleJoinCall = (roomName) => {
+    setVideoCallRoom(roomName);
+    setIsModalOpen(false);
   };
 
   const handleUpdateProfile = () => {
     setProfileModalOpen(true);
+  };
+
+  const handleTrainerSelection = (trainerId) => {
+    setSelectedTrainer((prev) =>
+
+      prev.includes(trainerId) ? prev.filter((id) => id !== trainerId) : [...prev, trainerId]
+    );
   };
 
   const cards = [
@@ -135,7 +134,7 @@ const ClientDashboard = () => {
       description: videoCallRoom ? 'Join the ongoing meeting' : 'Face-to-face meeting with your trainer',
       path: videoCallRoom ? `/video-call/${videoCallRoom}` : '#',
       icon: <i className="fas fa-video"></i>,
-      onClick: videoCallRoom ? null : handleMeetingClick,
+      onClick: handleMeetingClick,
     },
   ];
 
@@ -158,10 +157,21 @@ const ClientDashboard = () => {
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((card, index) => (
-          <Card key={index} title={card.title} description={card.description} path={card.path} icon={card.icon} onClick={card.onClick} />
+          <Card key={index}
+            title={card.title}
+            description={card.description}
+            path={card.path}
+            icon={card.icon}
+            onClick={card.onClick} />
         ))}
       </div>
-
+      {isModalOpen && (
+        <NotificationModal
+          notifications={notifications}
+          onClose={() => setIsModalOpen(false)}
+          onJoinCall={handleJoinCall}
+        />
+      )}
       {/* Progress Chart */}
       <div className="mt-12 p-8 bg-white rounded-lg shadow-lg">
         <h3 className="text-2xl font-semibold mb-4">Your Progress</h3>
@@ -171,30 +181,19 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {/* Add Trainer Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h3 className="text-2xl font-semibold mb-4">Select a Trainer for Video Call</h3>
-        <ul className="list-disc pl-5 max-h-64 overflow-y-auto">
-          {trainers.map((trainer) => (
-            <li key={trainer._id} className="mb-2 flex items-center">
-              <input
-                type="radio"
-                name="trainer"
-                className="mr-2"
-                checked={selectedTrainer === trainer._id}
-                onChange={() => handleTrainerSelection(trainer._id)}
-              />
-              {trainer.name}
-            </li>
-          ))}
-        </ul>
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-          onClick={handleStartVideoCall}
-        >
-          Start Video Call
-        </button>
-      </Modal>
+      <div id="client-list-section" className="mt-12 p-8 bg-white rounded-lg shadow-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl font-semibold">Your Trainers</h3>
+        </div>
+        <TrainerList clientId={stats?.clientId} />
+      </div>
+
+      {selectedTrainer && (
+        <TrainerProfile trainer={selectedTrainer} onClose={() => setSelectedTrainer(null)} />
+      )}
+      {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
+
+      <VcNotif notifications={notifications} onJoinCall={handleJoinCall} />
 
       {/* Video Call */}
       {videoCallRoom && <VideoCall roomName={videoCallRoom} />}
@@ -204,6 +203,7 @@ const ClientDashboard = () => {
       />
       {/* Notification Bar */}
       <NotifyBar visible={notifyBarVisible} onClose={() => setNotifyBarVisible(false)} />
+
     </div>
   );
 };

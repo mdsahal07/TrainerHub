@@ -1,23 +1,18 @@
 import Request from '../../models/Request.js'; // Import the Request model
 
-// Route to get accepted clients for the logged-in trainer
 export const acceptedClients = async (req, res) => {
 	try {
-		const trainerId = req.user.id; // Trainer ID from authenticated user
-		console.log("Trainer Id : ", trainerId);
-		// Find all requests where the trainer has accepted the client
+		const trainerId = req.user.id;
+
 		const acceptedRequests = await Request.find({
 			trainerId,
 			status: 'accepted',
-		}).populate('clientId'); // Populate client details
+		}).populate('clientId');
 
 		if (!acceptedRequests.length) {
 			return res.status(404).json({ message: 'No accepted clients found' });
 		}
-
-		// Extract client details from the populated `clientId`
 		const clients = acceptedRequests.map((request) => request.clientId);
-
 		res.status(200).json({ clients });
 	} catch (error) {
 		console.error('Error fetching accepted clients:', error);

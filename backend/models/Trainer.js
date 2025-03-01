@@ -12,15 +12,17 @@ const trainerSchema = new mongoose.Schema({
 	qualifications: { type: String, default: " " },
 	experience: { type: String, default: "" },
 	availability: { type: String },
+	status: { type: String, default: "" },
 	connection: [
 		{
 			clientId: mongoose.Schema.Types.ObjectId,
 			clientName: String,
-			status: { type: String, default: 'pending' }, // Default status is 'pending'
+			status: { type: String, default: 'pending' },
 		}],
 
 	resetPasswordToken: String,
 	resetPasswordExpires: Date,
+	role: { type: String, default: "trainer" }
 }, { timestamps: true });
 
 const Trainer = mongoose.model("Trainer", trainerSchema);

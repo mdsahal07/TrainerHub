@@ -6,6 +6,8 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import socketHandler from './socket/socketHandler.js';
 dotenv.config();
+import seedAdmin from './utils/seedAdmin.js';
+
 
 // import Routes
 import authRoutes from './routes/authRoutes.js';
@@ -19,6 +21,8 @@ import handleReq from './routes/handleReq.js';
 import scheduler from './routes/trainer/scheduleRoute.js';
 import notification from './routes/notify.js';
 import clientProf from './routes/trainer/clientProf.js';
+import admin from './routes/admin.js';
+import report from './routes/reportRoute.js';
 
 const app = express();
 const server = http.createServer(app); //creating http server for socket.io
@@ -46,10 +50,13 @@ app.use("/request", handleReq);
 app.use("/schedule", scheduler);
 app.use("/notify", notification);
 app.use("/clients", clientProf);
+app.use("/admin", admin);
+app.use("/report", report);
 
 // WebSocket Setup
 socketHandler(io)
 
+seedAdmin();
 //Database connection
 mongoose.connect(process.env.MONGO_URI)
 	.then(() => console.log("Database connected"))

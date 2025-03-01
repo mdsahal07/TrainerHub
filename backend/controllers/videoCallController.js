@@ -1,71 +1,51 @@
 import VideoCall from '../models/VideoCall.js';
-import Notification from '../models/VcNotif.js';
-import { io } from '../server.js';
+import Trainer from '../models/Trainer.js';
+import Client from '../models/Client.js';
+import VcNotif from '../models/VcNotif.js';
 
 export const startVideoCall = async (req, res) => {
-	const { clientIds } = req.body;
-
-	if (!clientIds || !Array.isArray(clientIds)) {
-		return res.status(400).json({ message: 'Invalid client IDs' });
-	}
-
-	const roomName = `trainer-room-${Date.now()}`;
 	try {
-		const videoCall = new VideoCall({ roomName, clients: clientIds });
-		await videoCall.save();
+		const { clientIds } = req.body;
+		const trainerId = req.user.id;
+		console.log("Clients ID : ", clientIds);
+		console.log("TrainerID : ", trainerId);
+		const trainer = await Trainer.findById(trainerId);
+		if (!trainer) {
+			return res.status(404).json({ message: 'Trainer not found' });
+		}
 
-		clientIds.forEach(async (clientId) => {
-			const notification = new Notification({
-				clientId,
-				message: `You have been invited to a video call. Room: ${roomName}`,
-				roomName,
-			});
-			await notification.save();
+		const roomName = `trainer-room-${Date.now()}`;
 
-			io.to(clientId).emit('receiveNotification', {
-				type: 'videoCall',
-				roomName,
-				description: 'You have been invited to a video call',
-				link: `/video-call/${roomName}`,
-			});
-		});
+		const newCall = new VideoCall({ trainerId, clientIds, roomName });
+		await newCall.save();
+
+		for (const clientId of clientIds) {
+			const client = await Client.findById(clientId);
+			if (client) {
+				const newVcNotif = new VcNotif({
+					recipientId: clientId,
+					recipientModel: 'Client',
+					message: `Join the call at ${roomName}`,
+				});
+				await newVcNotif.save();
+			}
+		}
 
 		res.status(200).json({ roomName });
-	} catch (err) {
-		res.status(500).json({ message: 'Failed to start video call', error: err.message });
+	} catch (error) {
+		res.status(500).json({ message: 'Failed to start video call', error });
 	}
 };
 
 export const getNotifications = async (req, res) => {
-	const { clientId } = req.params;
 	try {
-		const notifications = await Notification.find({ clientId });
+		const { userId, userModel } = req.params;
+		console.log("User Id : ", userId);
+		console.log("userModel :", userModel);
+		const notifications = await VcNotif.find({ recipientId: userId }).sort({ created: -1 }).limit(1);
+		console.log("Notificaitons : ", notifications);
 		res.status(200).json(notifications);
-	} catch (err) {
-		res.status(500).json({ message: 'Failed to fetch notifications', error: err.message });
-	}
-};
-
-export const handleResponse = async (req, res) => {
-	const { clientId, roomName, response } = req.body;
-
-	if (!clientId || !roomName || !response) {
-		return res.status(400).json({ message: 'Invalid data' });
-	}
-
-	try {
-		const videoCall = await VideoCall.findOne({ roomName });
-		if (!videoCall) {
-			return res.status(404).json({ message: 'Room not found' });
-		}
-
-		if (response === 'accept') {
-			videoCall.status = 'accepted';
-		}
-
-		await Notification.deleteOne({ clientId, roomName });
-		res.status(200).json({ message: 'Response recorded' });
-	} catch (err) {
-		res.status(500).json({ message: 'Failed to handle response', error: err.message });
+	} catch (error) {
+		res.status(500).json({ message: 'Failed to fetch notifications', error });
 	}
 };
