@@ -18,6 +18,8 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import ClientList from "./pages/admin/ClientList.jsx";
 import TrainerList from "./pages/admin/TrainerList.jsx";
+import RateTrainer from "./pages/RateTrainer.jsx";
+import About from "./pages/About.jsx";
 
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -50,6 +52,8 @@ function App() {
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
         <Route path="/clients" element={<ClientList />} />
         <Route path="/trainers" element={<TrainerList />} />
+        <Route path="/ratings/:trainerId" element={<RateTrainer />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   )

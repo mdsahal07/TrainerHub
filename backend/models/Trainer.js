@@ -13,6 +13,7 @@ const trainerSchema = new mongoose.Schema({
 	experience: { type: String, default: "" },
 	availability: { type: String },
 	status: { type: String, default: "" },
+	verified: { type: Boolean },
 	connection: [
 		{
 			clientId: mongoose.Schema.Types.ObjectId,

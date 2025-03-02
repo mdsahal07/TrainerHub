@@ -23,6 +23,8 @@ import notification from './routes/notify.js';
 import clientProf from './routes/trainer/clientProf.js';
 import admin from './routes/admin.js';
 import report from './routes/reportRoute.js';
+import weight from './routes/client/weightRoute.js';
+import rating from './routes/rateRoute.js';
 
 const app = express();
 const server = http.createServer(app); //creating http server for socket.io
@@ -52,6 +54,8 @@ app.use("/notify", notification);
 app.use("/clients", clientProf);
 app.use("/admin", admin);
 app.use("/report", report);
+app.use("/weight", weight);
+app.use("/ratings", rating);
 
 // WebSocket Setup
 socketHandler(io)

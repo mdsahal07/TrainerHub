@@ -42,6 +42,12 @@ const AdminDashboard = () => {
       path: '',
       icon: <i className="fas fa-envelope"></i>,
     },
+    {
+      title: 'App Feedback',
+      description: 'Feedback in got for the app',
+      path: '',
+      icon: <i className="fas fa-users"></i>,
+    },
   ];
 
   if (loading) return <div className="flex jusify-center items-center h-screen">< p className="text-xl" > Loading...</p ></div >;

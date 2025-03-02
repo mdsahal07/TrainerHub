@@ -6,7 +6,7 @@ import {
 	suspendUser,
 	deleteUser,
 	getFeedbacks,
-	getAdminDash
+	getAdminDash,
 } from '../controllers/adminController.js';
 
 import { verifyToken } from '../middleware/verifyToken.js';
@@ -19,7 +19,7 @@ router.get('/clients', getAllClients);
 
 router.get('/trainers', getAllTrainers);
 
-router.post('/users/:trainerId/verify', verifyTrainer);
+router.put('/:trainerId/verify', verifyTrainer);
 
 // Suspend a user
 router.put('/users/suspend/:userId', (req, res, next) => { console.log("Suspend route"); next(); }, suspendUser);

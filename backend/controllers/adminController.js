@@ -38,17 +38,13 @@ export const getAllClients = async (req, res) => {
 };
 
 export const verifyTrainer = async (req, res) => {
-	const { trainerId } = req.params;
 	try {
-		const trainer = await Trainer.findById(trainerId);
-		if (!trainer) {
-			return res.status(404).json({ message: 'Trainer not found' });
-		}
-		trainer.verified = true;
-		await trainer.save();
-		res.json({ message: 'Trainer verified successfully', trainer });
+		const { trainerId } = req.params;
+		console.log("TrainerId in admin : ", trainerId);
+		await Trainer.findByIdAndUpdate(trainerId, { verified: true });
+		res.status(200).json({ message: 'Trainer verified successfully' });
 	} catch (error) {
-		res.status(500).json({ message: 'Failed to verify trainer' });
+		res.status(500).json({ message: 'Failed to verify trainer', error });
 	}
 };
 

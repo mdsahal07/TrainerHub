@@ -2,13 +2,22 @@ import { React, useState } from 'react';
 import { ReqButton } from './ReqButton.jsx';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const TrainerProf = ({ trainer, onClose }) => {
 
 	const [isReportOpen, setIsReportOpen] = useState(false);
 	const [reportText, setReportText] = useState('');
 	const token = localStorage.getItem('token');
+	const [isAccepted, setIsAccepted] = useState(false);
 
+	const navigate = useNavigate();
+	const handleRate = () => {
+		navigate(`/ratings/${trainer._id}`);
+	};
+	const handleStatusChange = (status) => {
+		setIsAccepted(status === 'accepted');
+	};
 	const handleReport = async () => {
 		try {
 			const decodetoken = jwtDecode(token);
@@ -52,7 +61,7 @@ const TrainerProf = ({ trainer, onClose }) => {
 						</svg>
 					</button>
 					<div className="text-center mb-6 relative z-10 bg-gray-900 rounded-xl ">
-						<h2 className="text-3xl font-bold text-white mb-2">{trainer.username}</h2>
+						<h2 className="text-3xl font-bold text-white mb-2">{trainer.username}{trainer.verified && <img src="/approve.png" alt="Verified" className="inline h-6 w-6 ml-2" />}</h2>
 						<p className="text-lg text-white">{trainer.specialization}</p>
 					</div>
 					<div className="space-y-4 relative z-10">
@@ -62,8 +71,15 @@ const TrainerProf = ({ trainer, onClose }) => {
 						<p className="text-gray-300"><strong className="text-white">Qualifications:</strong> {trainer.qualifications}</p>
 						<p className="text-gray-300"><strong className="text-white">Rating:</strong> {trainer.rating} ⭐</p>
 						<p className="text-gray-300"><strong className="text-white">Availability:</strong> {trainer.availability ? 'Available' : 'Not Available'}</p>
-						{trainer.availability && <ReqButton trainerId={trainer._id} />}
-
+						{trainer.availability && <ReqButton trainerId={trainer._id} onStatusChange={handleStatusChange} />}
+						{isAccepted && (
+							<button
+								onClick={handleRate}
+								className="bg-yellow-500 text-white px-6 py-2 ml-4 rounded-lg hover:bg-yellow-600 transition duration-200"
+							>
+								Rate
+							</button>
+						)}
 					</div>
 					<div className="mt-6 text-center relative z-10">
 						<button

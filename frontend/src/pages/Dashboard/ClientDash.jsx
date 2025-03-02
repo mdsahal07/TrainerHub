@@ -9,6 +9,9 @@ import { jwtDecode } from 'jwt-decode';
 import VcNotif from '../../components/VcNotif.jsx';
 import VideoCall from '../../components/VideoCall.jsx';
 import NotificationModal from '../../components/VcNotification.jsx';
+import WeightForm from '../../components/WeightForm.jsx';
+import WeightChart from '../../components/WeightChart.jsx';
+
 
 const ClientDashboard = () => {
   const [stats, setStats] = useState();
@@ -21,6 +24,7 @@ const ClientDashboard = () => {
   const [notifyBarVisible, setNotifyBarVisible] = useState(false); // State for notification bar
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [weightData, setWeightData] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -32,7 +36,6 @@ const ClientDashboard = () => {
 
         const { name, progress } = response.data;
 
-        // Set data for dashboard
         setStats(response.data);
         setLoading(false);
       } catch (err) {
@@ -55,8 +58,23 @@ const ClientDashboard = () => {
       }
     };
 
+
+    const fetchWeightData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:5000/weight/${decodeToken.userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWeightData(response.data);
+        console.log("Weight : ", weightData);
+      } catch (err) {
+        console.error('Failed to fetch weight data:', err);
+      }
+    };
+
     fetchStats();
     fetchTrainers();
+    fetchWeightData();
   }, []);
 
   const token = localStorage.getItem('token');
@@ -98,7 +116,9 @@ const ClientDashboard = () => {
     fetchNotifications();
   };
 
-
+  const handleWeightUpdate = (updatedWeightData) => {
+    setWeightData(updatedWeightData);
+  };
 
   const handleJoinCall = (roomName) => {
     setVideoCallRoom(roomName);
@@ -126,7 +146,7 @@ const ClientDashboard = () => {
     {
       title: 'Your Trainer',
       description: 'Trainer profile (Rate & feedback)',
-      path: '/trainer',
+      path: '#trainerList',
       icon: <i className="fas fa-dumbbell"></i>,
     },
     {
@@ -172,16 +192,27 @@ const ClientDashboard = () => {
           onJoinCall={handleJoinCall}
         />
       )}
-      {/* Progress Chart */}
-      <div className="mt-12 p-8 bg-white rounded-lg shadow-lg">
-        <h3 className="text-2xl font-semibold mb-4">Your Progress</h3>
-        {/* You can add a progress chart component or visualization here */}
-        <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-          <p className="text-gray-500">Progress chart will be displayed here.</p>
+
+      {/* Weight Chart Section */}
+      <div className="flex flex-row">
+        <div className="mt-12 mr-9 p-8 bg-white rounded-lg shadow-lg">
+          <h3 className="text-2xl font-semibold mb-4">Update Your Weight</h3>
+          <WeightForm clientId={userId} onUpdate={handleWeightUpdate} />
+        </div>
+        <div className="ml-9 mt-12 p-8 bg-white rounded-lg shadow-lg">
+          <h3 className="flex justify-center text-3xl font-semibold mb-4 mr-10">Your Progress</h3>
+          {weightData ? (
+            <WeightChart weightData={weightData} />
+          ) : (
+            <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">Progress chart will be displayed here.</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <div id="client-list-section" className="mt-12 p-8 bg-white rounded-lg shadow-lg">
+      {/* Trainer List */}
+      <div id="trainerList" className="mt-12 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-semibold">Your Trainers</h3>
         </div>

@@ -48,6 +48,18 @@ const TrainerList = () => {
     }
   };
 
+  const handleVerify = async (trainerId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/admin/${trainerId}/verify`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTrainers(trainers.map(trainer => trainer._id === trainerId ? { ...trainer, verified: true } : trainer));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to verify trainer');
+    }
+  };
+
   if (loading) return <div className="flex justify-center items-center h-screen"><p className="text-xl">Loading...</p></div>;
   if (error) return <div className="flex justify-center items-center h-screen"><p className="text-xl text-red-500">{error}</p></div>;
 
@@ -64,18 +76,26 @@ const TrainerList = () => {
               </div>
               <div>
                 <button
-                  className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition duration-200 mr-2"
+                  className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition duration-200 mr-4"
                   onClick={() => handleSuspend(trainer._id)}
                   disabled={trainer.status === 'suspended'}
                 >
                   {trainer.status === 'suspended' ? 'Suspended' : 'Suspend'}
                 </button>
                 <button
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-200"
+                  className="px-4 py-2 mr-4 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-200"
                   onClick={() => handleDelete(trainer._id)}
                 >
                   Delete
                 </button>
+                {!trainer.verified && (
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+                    onClick={() => handleVerify(trainer._id)}
+                  >
+                    Verify
+                  </button>
+                )}
               </div>
             </li>
           ))}
